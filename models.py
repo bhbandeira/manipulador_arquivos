@@ -4,6 +4,7 @@ from datetime import datetime
 from converters.mkv_to_mp4 import MKVtoMP4Converter
 from converters.avi_to_mp4 import AVIToMP4Converter
 from converters.wmv_to_mp4 import WMVtoMP4Converter
+from converters.wav_to_mp3 import WAVtoMP3Converter
 from compressors.mp4_compressor import MP4Compressor
 
 # Inicializa os conversores
@@ -12,6 +13,8 @@ mkv_converter = MKVtoMP4Converter()
 avi_converter = AVIToMP4Converter()
 
 wmv_converter = WMVtoMP4Converter()
+
+mp3_converter = WAVtoMP3Converter()
 
 # Inicializa o compressores
 mp4_compressor = MP4Compressor()
@@ -92,6 +95,24 @@ def handle_file_action(filepath, action, download_folder):
                 'status': 'success',
                 'message': "Conversão concluída com sucesso!",
                 'download_url': f"/downloads/{os.path.basename(output_path)}"
+            }
+        
+        # Ação de conversão para mp3
+        if action == 'convert_to_mp3' and file_ext in ['wav']:
+            output_filename = f"{base_name}_converted.mp3"
+
+            output_path = mp3_converter.convert(filepath, output_filename, download_folder)
+
+            # Remove o arquivo original após conversão
+            try:
+                os.remove(filepath)
+            except Exception as e:
+                print(f"AVISO: Não foi possível remover o original: {str(e)}")
+            
+            return {
+                'status': 'success',
+                'message': "Conversão concluída com sucesso!",
+                'download_url': f"/downloads/{output_path}"
             }
         
         # Ação de comprimir arquivos MP4

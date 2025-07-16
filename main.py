@@ -11,7 +11,7 @@ app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['DOWNLOAD_CONVERT_FOLDER'] = 'converted/downloads'
 app.config['DOWNLOAD_COMPRESS_FOLDER'] = 'compresed/downloads'
 app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024 * 1024  # 1GB
-app.config['ALLOWED_EXTENSIONS'] = {'wmv','mp4','avi','mkv','txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'csv', 'xlsx', 'docx'}
+app.config['ALLOWED_EXTENSIONS'] = {'wmv','mp4','avi','mkv','wav', 'pdf', 'png', 'jpg', 'jpeg', 'mp3', 'csv', 'xlsx', 'docx'}
 
 # Certifique-se de que as pastas existam
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)

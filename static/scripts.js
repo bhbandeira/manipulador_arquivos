@@ -94,6 +94,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 );
                 actionButtons.appendChild(compressButton2);
             }
+            /// Verifica se é um arquivo wav
+            else if (summary?.type === 'wav') {
+                const convertButton = createActionButton(
+                    'convert_to_mp3',
+                    'converter para MP3',
+                    '#ff9800'
+                );
+                actionButtons.appendChild(convertButton);
+            }
             // Verifica se é um arquivo conversível (MKV, AVI, WMV)
             else if (summary?.convertible) {
                 const convertButton = createActionButton(
