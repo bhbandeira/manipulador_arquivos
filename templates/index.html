@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tratamento de Arquivos</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Microserviço de Tratamento de Arquivos</h1>
+        
+        <div class="upload-section">
+            <h2>Envie seu arquivo</h2>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <input type="file" name="file" id="fileInput" required>
+                <button type="submit">Enviar</button>
+            </form>
+        </div>
+        
+        <div id="fileInfo" class="hidden">
+            <h2>Informações do Arquivo</h2>
+            <div id="fileSummary"></div>
+            
+            <div class="actions-section">
+                <h2>Ações Disponíveis</h2>
+                <form id="actionForm">
+                    <input type="hidden" id="filename" name="filename">
+                    
+                    <div class="action-buttons">
+                        
+                    </div>
+                </form>
+            </div>
+            
+            <div id="actionResult"></div>
+        </div>
+    </div>
+    
+    <script src="/static/scripts.js"></script>
+</body>
+</html>
