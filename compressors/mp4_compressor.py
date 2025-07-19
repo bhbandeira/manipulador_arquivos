@@ -1,24 +1,14 @@
 import os
-import uuid
 import subprocess
 import logging
-from datetime import datetime
-import time
 
 
 class MP4Compressor:
-    def __init__(self,compressed_folder='compresed/downloads'):
+    def __init__(self,compressed_folder='compressed/downloads'):
         self.compressed_folder = compressed_folder
         
         # Configuração de logging
         self.logger = logging.getLogger(__name__)
-
-    def _generate_unique_filename(self, original_name):
-        """Gera um nome de arquivo único com timestamp e UUID"""
-        base, ext = os.path.splitext(original_name)
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        unique_id = str(uuid.uuid4())[:8]  # Pega os primeiros 8 caracteres do UUID
-        return f"{base}_{timestamp}_{unique_id}{ext}"
 
     def compress(self, input_path, output_filename, crf):
         """Comprime o arquivo MP4 usando FFmpeg"""

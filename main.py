@@ -2,25 +2,21 @@ import os
 from flask import Flask, render_template, request, redirect, send_from_directory, jsonify
 from werkzeug.utils import secure_filename
 from models import  get_file_summary, handle_file_action
+from config.config import Config
 import time
 import threading
 
+
 # Configurações
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['DOWNLOAD_CONVERT_FOLDER'] = 'converted/downloads'
-app.config['DOWNLOAD_COMPRESS_FOLDER'] = 'compresed/downloads'
-app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024 * 1024  # 1GB
-app.config['ALLOWED_EXTENSIONS'] = {'wmv','mp4','avi','mkv','wav', 'pdf', 'png', 'jpg', 'jpeg', 'mp3', 'csv', 'xlsx', 'docx'}
 
-# Certifique-se de que as pastas existam
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-os.makedirs(app.config['DOWNLOAD_CONVERT_FOLDER'], exist_ok=True)
-os.makedirs(app.config['DOWNLOAD_COMPRESS_FOLDER'], exist_ok=True)
+# Inicializar configurações
+Config.create_folders()
+
 
 def allowed_file(filename):
     return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+           filename.rsplit('.', 1)[1].lower() in Config.ALLOWED_EXTENSIONS
 
 def agendar_remocao(filepath, delay=10):
     def remover():
@@ -44,10 +40,21 @@ def upload_file():
     file = request.files['file']
     if file.filename == '':
         return redirect(request.url)
-    
+
     if file and allowed_file(file.filename):
+        # Verificar tamanho do arquivo
+        file.seek(0, os.SEEK_END)
+        file_length = file.tell()
+        file.seek(0)  # Voltar ao início do arquivo
+
+        if file_length > Config.MAX_CONTENT_LENGTH:
+            return jsonify({
+                'status': 'warning',
+                'message': f'O arquivo excede o tamanho máximo permitido de 1GB.'
+            }), 400
+        
         filename = secure_filename(file.filename)
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        filepath = Config.UPLOAD_FOLDER / filename
         file.save(filepath)
         
         # Processa o arquivo e obtém o resumo
@@ -74,7 +81,7 @@ def process_action():
                 'details': 'Nome do arquivo ou ação não fornecidos'
             })
         
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        filepath = Config.UPLOAD_FOLDER / filename
         
         if not os.path.exists(filepath):
             return jsonify({
@@ -85,9 +92,9 @@ def process_action():
         
         # Processa a ação selecionada
         if "compress" in action:
-            result = handle_file_action(filepath, action, app.config['DOWNLOAD_COMPRESS_FOLDER'])
+            result = handle_file_action(filepath, action, Config.DOWNLOAD_COMPRESS_FOLDER)
         else:
-            result = handle_file_action(filepath, action, app.config['DOWNLOAD_CONVERT_FOLDER'])
+            result = handle_file_action(filepath, action, Config.DOWNLOAD_CONVERT_FOLDER)
         
         # Log para depuração
         app.logger.info(f"Ação '{action}' executada em {filename}. Resultado: {result}")
@@ -123,7 +130,7 @@ def download_file(filename):
         
         if "compressed" in filename:
             # Verifica se o arquivo existe
-            filepath = os.path.join(app.config['DOWNLOAD_COMPRESS_FOLDER'], filename)
+            filepath = Config.DOWNLOAD_COMPRESS_FOLDER / filename
 
             if not os.path.exists(filepath):
                 return jsonify({
@@ -135,7 +142,8 @@ def download_file(filename):
             agendar_remocao(filepath)
                         
             return send_from_directory(
-                app.config['DOWNLOAD_COMPRESS_FOLDER'],
+                
+                Config.DOWNLOAD_COMPRESS_FOLDER,
                 filename,
                 as_attachment=True,
                 mimetype='video/mp4'
@@ -143,9 +151,9 @@ def download_file(filename):
         
         else:
             # Verifica se o arquivo existe
-
-            filepath = os.path.join(app.config['DOWNLOAD_CONVERT_FOLDER'], filename)
-
+            
+            filepath = Config.DOWNLOAD_CONVERT_FOLDER / filename
+            
             if not os.path.exists(filepath):
                 return jsonify({
                     'status': 'error',
@@ -156,7 +164,7 @@ def download_file(filename):
             agendar_remocao(filepath)
                         
             return send_from_directory(
-                app.config['DOWNLOAD_CONVERT_FOLDER'],
+                Config.DOWNLOAD_CONVERT_FOLDER,
                 filename,
                 as_attachment=True,
                 mimetype='video/mp4'

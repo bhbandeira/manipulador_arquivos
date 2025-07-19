@@ -1,147 +1,228 @@
+/* ===== VARIÁVEIS E ESTILOS GLOBAIS ===== */
+:root {
+  --primary-color: #4CAF50;
+  --primary-hover: #45a049;
+  --secondary-color: #007bff;
+  --secondary-hover: #0069d9;
+  --danger-color: #dc3545;
+  --danger-hover: #c82333;
+  --warning-color: #ffc107;
+  --warning-hover: #e0a800;
+  --light-gray: #f5f5f5;
+  --border-color: #ddd;
+  --text-color: #333;
+  --text-light: #555;
+  --success-bg: #d4edda;
+  --success-text: #155724;
+  --error-bg: #f8d7da;
+  --error-text: #721c24;
+  --warning-bg: #fff3cd;
+  --warning-text: #856404;
+  --border-radius: 4px;
+  --box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s ease;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    margin: 0;
-    padding: 20px;
-    background-color: #f5f5f5;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  padding: 20px;
+  background-color: var(--light-gray);
+  color: var(--text-color);
 }
 
+/* ===== LAYOUT E CONTAINERS ===== */
 .container {
-    max-width: 800px;
-    margin: 0 auto;
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: 0 auto;
+  background: white;
+  padding: 20px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
 }
 
-h1, h2 {
-    color: #333;
-}
-
-.upload-section, .actions-section {
-    margin-bottom: 20px;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+.upload-section, 
+.actions-section {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
 }
 
 .hidden {
-    display: none;
+  display: none;
 }
 
+/* ===== BOTÕES ===== */
 button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin: 5px;
+  background-color: var(--primary-color);
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  margin: 5px;
+  font-weight: bold;
+  min-width: 120px;
+  transition: var(--transition);
 }
 
 button:hover {
-    background-color: #45a049;
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-#fileSummary {
-    padding: 10px;
-    background-color: #f9f9f9;
-    border-radius: 4px;
-}
-
-.action-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-#actionResult {
-    padding: 10px;
-    margin-top: 15px;
-    border-radius: 4px;
-}
-
-.success {
-    background-color: #dff0d8;
-    color: #3c763d;
-    border: 1px solid #d6e9c6;
-}
-
-.error {
-    background-color: #f2dede;
-    color: #a94442;
-    border: 1px solid #ebccd1;
-}
-
-button[data-action="convert_mkv_mp4"] {
-    background-color: #007bff;
-}
-
-button[data-action="convert_mkv_mp4"]:hover {
-    background-color: #0069d9;
-}
-
-.progress-container {
-    margin-top: 15px;
-    width: 100%;
-    background-color: #f1f1f1;
-    border-radius: 4px;
-    display: none;
-}
-
-.progress-bar {
-    height: 20px;
-    background-color: #4CAF50;
-    border-radius: 4px;
-    width: 0%;
-    transition: width 0.3s;
-}
-.error-message {
-    color: #721c24;
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    padding: 10px 15px;
-    border-radius: 4px;
-    margin: 10px 0;
-}
-
-.error-message small {
-    color: #856404;
-    font-size: 0.9em;
+button:active {
+  transform: translateY(0);
 }
 
 button:disabled {
-    background-color: #cccccc !important;
-    cursor: not-allowed;
+  background-color: #cccccc !important;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Botões específicos por ação */
+button[data-action="convert_mkv_mp4"] {
+  background-color: var(--secondary-color);
+}
+
+button[data-action="convert_mkv_mp4"]:hover {
+  background-color: var(--secondary-hover);
+}
+
+/* ===== BOTÕES DE AÇÃO E SUB-AÇÃO ===== */
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.sub-buttons-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin-top: 10px;
+  padding-left: 15px;
+  border-left: 3px solid #eee;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.sub-buttons-container button {
+  padding: 8px 12px;
+  font-size: 0.9em;
+  margin-left: 15px;
+  opacity: 0.9;
+  transform: scale(0.98);
+  min-width: auto;
+}
+
+.sub-buttons-container button:hover {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ===== SEÇÃO DE INFORMAÇÕES DO ARQUIVO ===== */
+#fileSummary {
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: var(--border-radius);
+}
+
+/* ===== MENSAGENS DE STATUS ===== */
+#actionResult {
+  padding: 10px;
+  margin-top: 15px;
+  border-radius: var(--border-radius);
+}
+
+.success {
+  color: var(--success-text);
+  background-color: var(--success-bg);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.error {
+  color: var(--error-text);
+  background-color: var(--error-bg);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.warning-message {
+  color: var(--warning-text);
+  background-color: var(--warning-bg);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 10px 15px;
+  border-radius: var(--border-radius);
+  margin: 10px 0;
 }
 
 .processing {
-    background-color: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeeba;
+  background-color: var(--warning-bg);
+  color: var(--warning-text);
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
+/* ===== LINKS ===== */
 .download-link {
-    color: #155724;
-    text-decoration: underline;
-    font-weight: bold;
+  color: var(--success-text);
+  text-decoration: underline;
+  font-weight: bold;
 }
 
 .download-link:hover {
-    color: #0d3c21;
+  color: #0d3c21;
 }
 
-button[data-action] {
-    transition: all 0.3s ease;
+/* ===== BARRA DE PROGRESSO ===== */
+.progress-container {
+  margin-top: 15px;
+  width: 100%;
+  background-color: #f1f1f1;
+  border-radius: var(--border-radius);
+  display: none;
 }
 
-button[data-action]:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+.progress-bar {
+  height: 20px;
+  background-color: var(--primary-color);
+  border-radius: var(--border-radius);
+  width: 0%;
+  transition: width 0.3s;
 }
 
-button[data-action]:active {
-    transform: translateY(0);
+/* ===== ANIMAÇÕES ===== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 600px) {
+  .container {
+    padding: 15px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .action-buttons button {
+    width: 100%;
+  }
+  
+  .sub-buttons-container {
+    width: 100%;
+    margin-top: 5px;
+  }
+  
+  .sub-buttons-container button {
+    width: calc(100% - 15px);
+    margin-left: 0;
+  }
+}

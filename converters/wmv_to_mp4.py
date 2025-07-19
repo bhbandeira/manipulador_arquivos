@@ -21,7 +21,7 @@ class WMVtoMP4Converter:
         # Gera nome único para o arquivo de saída
         unique_output_name = self._generate_unique_filename(output_filename)
 
-        output_path = os.path.join(unique_output_name)
+        output_path = os.path.join(converted_folder, unique_output_name)
         
         try:
             (
