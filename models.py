@@ -7,6 +7,9 @@ import uuid
 from converters.mkv_to_mp4 import MKVtoMP4Converter
 from converters.avi_to_mp4 import AVIToMP4Converter
 from converters.wmv_to_mp4 import WMVtoMP4Converter
+from converters.asf_to_mp4 import ASFtoMP4Converter
+from converters.mov_to_mp4 import MOVtoMP4Converter
+from converters.webm_to_mp4 import WEBMtoMP4Converter
 from converters.wav_to_mp3 import WAVtoMP3Converter
 from compressors.mp4_compressor import MP4Compressor
 from compressors.pdf_compressor import PDFCompressor
@@ -17,10 +20,13 @@ class FileProcessor:
     def __init__(self):
         # Inicializa todos os processadores
         self.converters = {
-            'mkv': MKVtoMP4Converter(),
-            'avi': AVIToMP4Converter(),
-            'wmv': WMVtoMP4Converter(),
-            'wav': WAVtoMP3Converter()
+            'mkv' : MKVtoMP4Converter(),
+            'avi' : AVIToMP4Converter(),
+            'wmv' : WMVtoMP4Converter(),
+            'asf' : ASFtoMP4Converter(),
+            'mov' : MOVtoMP4Converter(),
+            'webm': WEBMtoMP4Converter(),
+            'wav' : WAVtoMP3Converter()
         }
         
         self.compressors = {
