@@ -68,6 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const button = document.createElement('button');
         button.type = 'button';
         button.dataset.action = action;
+        button.dataset.isSub = isSubButton.toString();
         button.textContent = label;
         button.style.backgroundColor = color;
         
@@ -78,12 +79,19 @@ document.addEventListener('DOMContentLoaded', function() {
             button.style.fontSize = '0.9em';
         }
         
-        button.addEventListener('click', (e) => {
-            if (!isSubButton) {
-                e.stopPropagation(); 
-                showSubOptions(action);
-            } else {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Verifica se é sub-botão pelo atributo dataset
+            const isSub = this.dataset.isSub === 'true';
+            
+            if (isSub) {
+                console.log('Sub-botão clicado:', action);
                 processAction(action);
+            } else {
+                console.log('Botão principal clicado:', action);
+                showSubOptions(action);
             }
         });
         
@@ -97,66 +105,56 @@ document.addEventListener('DOMContentLoaded', function() {
             subButtonsContainer.remove();
         }
 
-        // Cria um novo container para os sub-botões
+        // Cria novo container para sub-botões
         const newSubContainer = document.createElement('div');
         newSubContainer.className = 'sub-buttons-container';
-        newSubContainer.style.marginTop = '10px';
-        newSubContainer.style.paddingLeft = '20px';
-        newSubContainer.style.borderLeft = '3px solid #eee';
-
         
-        
-
-
         // Adiciona os sub-botões específicos
         switch (mainAction) {
             case 'compress_pdf':
-                const compressButton1 = createActionButton(
-                    'compress_pdf_low', 
-                    'Baixa Qualidade (Tamanho menor)', 
-                    '#f44336', 
-                    true
-                );
-                const compressButton2 = createActionButton(
-                    'compress_pdf_medium', 
-                    'Média Qualidade', 
-                    '#ff9800', 
-                    true
-                );
-                const compressButton3 = createActionButton(
-                    'compress_pdf_high', 
-                    'Alta Qualidade (Melhor qualidade)', 
-                    '#4CAF50', 
-                    true
-                );
-                
-                newSubContainer.appendChild(compressButton1);
-                newSubContainer.appendChild(compressButton2);
-                newSubContainer.appendChild(compressButton3);
+                newSubContainer.appendChild(createActionButton(
+                    'compress_pdf_low', 'Baixa Qualidade', '#f44336', true
+                ));
+                newSubContainer.appendChild(createActionButton(
+                    'compress_pdf_medium', 'Média Qualidade', '#ff9800', true
+                ));
+                newSubContainer.appendChild(createActionButton(
+                    'compress_pdf_high', 'Alta Qualidade', '#4CAF50', true
+                ));
                 break;
                 
             case 'split_pdf':
-                const splitButton1 = createActionButton(
-                    'split_pdf_range', 
-                    'Por intervalo de páginas', 
-                    '#2196F3', 
-                    true
-                );
-                const splitButton2 = createActionButton(
-                    'split_pdf_single', 
-                    'Separar cada página', 
-                    '#2196F3', 
-                    true
-                );
+                newSubContainer.appendChild(createActionButton(
+                    'split_pdf_range', 'Por intervalo', '#2196F3', true
+                ));
+                newSubContainer.appendChild(createActionButton(
+                    'split_pdf_single', 'Separar páginas', '#2196F3', true
+                ));
+                break;
                 
-                newSubContainer.appendChild(splitButton1);
-                newSubContainer.appendChild(splitButton2);
+            case 'convert_to_mp4':
+                // Exemplo para vídeos - pode adicionar opções de qualidade
+                newSubContainer.appendChild(createActionButton(
+                    'convert_to_mp4_fast', 'Conversão Rápida', '#FF9800', true
+                ));
+                newSubContainer.appendChild(createActionButton(
+                    'convert_to_mp4_hq', 'Alta Qualidade', '#FF5722', true
+                ));
+                break;
+            case 'convert_to_mp3':
+                // Exemplo para vídeos - pode adicionar opções de qualidade
+                newSubContainer.appendChild(createActionButton(
+                    'convert_to_mp3_fast', 'Conversão Rápida', '#FF9800', true
+                ));
+                newSubContainer.appendChild(createActionButton(
+                    'convert_to_mp3_hq', 'Alta Qualidade', '#FF5722', true
+                ));
                 break;
         }
 
-        // Insere o container de sub-botões após os botões principais
-        const actionButtons = document.querySelector('.action-buttons');
-        if (actionButtons && newSubContainer.children.length > 0) {
+        // Insere o container se houver sub-botões
+        if (newSubContainer.children.length > 0) {
+            const actionButtons = document.querySelector('.action-buttons');
             actionButtons.parentNode.insertBefore(newSubContainer, actionButtons.nextSibling);
         }
     };
@@ -179,81 +177,49 @@ document.addEventListener('DOMContentLoaded', function() {
     const updateActionButtons = (summary) => {
         try {
             const actionButtons = document.querySelector('.action-buttons');
-            if (!actionButtons) {
-                console.error('Elemento .action-buttons não encontrado');
-                return;
-            }
+            if (!actionButtons) return;
             
             actionButtons.innerHTML = '';
             
-            // Para arquivos PDF
+            // Ações para PDF
             if (summary?.type === 'pdf') {
-                const compressBtn = createActionButton(
-                    'compress_pdf', 
-                    'Comprimir PDF', 
-                    '#4CAF50'
-                );
-                const splitBtn = createActionButton(
-                    'split_pdf', 
-                    'Dividir PDF', 
-                    '#2196F3'
-                );
-                const mergeBtn = createActionButton(
-                    'merge_pdf', 
-                    'Juntar PDFs', 
-                    '#9C27B0'
-                );
-                
-                actionButtons.appendChild(compressBtn);
-                actionButtons.appendChild(splitBtn);
-                actionButtons.appendChild(mergeBtn);
+                actionButtons.appendChild(createActionButton(
+                    'compress_pdf', 'Comprimir PDF', '#4CAF50'
+                ));
+                actionButtons.appendChild(createActionButton(
+                    'split_pdf', 'Dividir PDF', '#2196F3'
+                ));
+                actionButtons.appendChild(createActionButton(
+                    'merge_pdf', 'Juntar PDFs', '#9C27B0'
+                ));
             }
-
-            // Adiciona ações padrão
-            defaultActions.forEach(item => {
-                const button = createActionButton(item.action, item.label);
-                if (button) {
-                    actionButtons.appendChild(button);
-                }
-            });
-            
-            /// Verifica se é um arquivo MP4 (compressível)
-            if (summary?.type === 'mp4') {
-                const compressButton1 = createActionButton(
-                    'compress_mp4_28', 
-                    'Comprimir (Boa qualidade)', 
-                    '#4CAF50'
-                );
-                actionButtons.appendChild(compressButton1);
-                
-                const compressButton2 = createActionButton(
-                    'compress_mp4_24', 
-                    'Comprimir (Melhor qualidade)', 
-                    '#2196F3'
-                );
-                actionButtons.appendChild(compressButton2);
+            // Ações para MP4
+            else if (summary?.type === 'mp4') {
+                actionButtons.appendChild(createActionButton(
+                    'compress_mp4_28', 'Comprimir (Boa qualidade)', '#4CAF50'
+                ));
+                actionButtons.appendChild(createActionButton(
+                    'compress_mp4_24', 'Comprimir (Melhor qualidade)', '#2196F3'
+                ));
             }
-
-            /// Verifica se é um arquivo wav
+            // Ações para WAV
             else if (summary?.type === 'wav') {
-                const convertButton = createActionButton(
-                    'convert_to_mp3',
-                    'converter para MP3',
-                    '#ff9800'
-                );
-                actionButtons.appendChild(convertButton);
+                actionButtons.appendChild(createActionButton(
+                    'convert_to_mp3', 'Converter para MP3', '#ff9800'
+                ));
             }
-            // Verifica se é um arquivo conversível (MKV, AVI, WMV)
-            else if (summary?.convertible) {
-                const convertButton = createActionButton(
-                    'convert_to_mp4', 
-                    'Converter para MP4', 
-                    '#FF9800'
-                );
-                actionButtons.appendChild(convertButton);
+            // Ações para vídeos conversíveis (incluindo ASF)
+            else if (summary?.convertible || summary?.type === 'asf') {
+                actionButtons.appendChild(createActionButton(
+                    'convert_to_mp4', 'Converter para MP4', '#FF9800'
+                ));
             }
 
-        
+            // Ações padrão
+            defaultActions.forEach(item => {
+                actionButtons.appendChild(createActionButton(item.action, item.label));
+            });
+
         } catch (error) {
             console.error('Erro em updateActionButtons:', error);
         }
@@ -278,6 +244,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(handleResponse)
         .then(data => {
             // Limpa classes anteriores
+            actionResult.className = '';
             actionResult.classList.remove('hidden', 'success', 'error', 'warning');
 
             // Aplica a classe com base no status retornado

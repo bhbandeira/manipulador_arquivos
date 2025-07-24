@@ -80,13 +80,14 @@ class FileProcessor:
     
     def _check_video_operations(self, filepath: str, file_ext: str, summary: Dict[str, Any]):
         """Verifica operações disponíveis para arquivos de vídeo"""
-        if file_ext in ['mkv', 'avi', 'wmv']:
+        if file_ext in ['mkv', 'avi', 'wmv', 'asf']:
             try:
                 with open(filepath, 'rb') as f:
                     header = f.read(12)
                     if (file_ext == 'wmv' and header[:4] == b'\x30\x26\xB2\x75') or \
                        (file_ext == 'mkv' and header[:4] == b'\x1A\x45\xDF\xA3') or \
-                       (file_ext == 'avi' and header[:4] == b'RIFF' and header[8:12] == b'AVI '):
+                       (file_ext == 'avi' and header[:4] == b'RIFF' and header[8:12] == b'AVI ') or \
+                       (file_ext == 'asf' and header[:4] == b'\x30\x26\xB2\x75'):
                         summary['convertible'] = True
                         summary['conversion_options'] = ['MP4']
             except Exception as e:
@@ -143,6 +144,7 @@ class FileProcessor:
             output_filename = f"{base_name}_converted.mp4"
         
         output_path = converter.convert(filepath, output_filename, download_folder)
+        
         self._cleanup_original(filepath)
         
         return {
