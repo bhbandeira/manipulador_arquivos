@@ -16,9 +16,15 @@ class Config:
     
     # Extensões permitidas
     ALLOWED_EXTENSIONS = {
-        'wmv', 'mp4', 'avi', 'mkv', 'wav','mov','asf','webm',  # Vídeo/áudio
-        'pdf', 'png', 'jpg', 'jpeg',                           # Documentos/imagens
-        'mp3', 'csv', 'xlsx', 'docx'                           # Outros
+        # videos
+        '3g2', '3gp', 'aaf', 'avchd', 'cavs', 'divx', 'dv', 'f4v', 'flv',
+        'hevc', 'm2ts', 'm2v', 'm4v', 'mjpeg', 'mkv', 'mod', 'mpeg', 'mpeg-2',
+        'mpg', 'mts', 'mxf', 'ogv', 'rm', 'rmvb', 'swf', 'tod', 'ts', 'vob',
+        'webm', 'wtv', 'xvid', 'wmv', 'avi', 'asf', 'mov', 'mp4',
+        # Documentos/imagens
+        'pdf', 'png', 'jpg', 'jpeg',         
+        # Outros                  
+        'mp3','wav', 'csv', 'xlsx', 'docx'                           
     }
     
     # Configurações específicas para conversão/compressão

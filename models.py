@@ -10,6 +10,7 @@ from converters.wmv_to_mp4 import WMVtoMP4Converter
 from converters.asf_to_mp4 import ASFtoMP4Converter
 from converters.mov_to_mp4 import MOVtoMP4Converter
 from converters.webm_to_mp4 import WEBMtoMP4Converter
+from converters.generic_to_mp4 import GenericToMP4Converter
 from converters.wav_to_mp3 import WAVtoMP3Converter
 from compressors.mp4_compressor import MP4Compressor
 from compressors.pdf_compressor import PDFCompressor
@@ -28,6 +29,9 @@ class FileProcessor:
             'webm': WEBMtoMP4Converter(),
             'wav' : WAVtoMP3Converter()
         }
+
+        # Conversor genérico para outros formatos
+        self.generic_converter = GenericToMP4Converter()
         
         self.compressors = {
             'mp4': MP4Compressor(),
@@ -80,20 +84,54 @@ class FileProcessor:
     
     def _check_video_operations(self, filepath: str, file_ext: str, summary: Dict[str, Any]):
         """Verifica operações disponíveis para arquivos de vídeo"""
-        if file_ext in ['mkv', 'avi', 'wmv', 'asf']:
+        video_formats = {
+            # Formatos com assinaturas conhecidas
+            '3g2': lambda h: h[4:8] in [b'ftyp3g2a', b'ftyp3g2b'],
+            '3gp': lambda h: h[4:8] in [b'ftyp3gp4', b'ftyp3gp5'],
+            'avi': lambda h: h[:4] == b'RIFF' and h[8:12] == b'AVI ',
+            'flv': lambda h: h[:4] == b'FLV\x01',
+            'm2v': lambda h: h[:4] == b'\x00\x00\x01\xBA',
+            'm4v': lambda h: h[4:8] == b'ftypM4V ',
+            'mkv': lambda h: h[:4] == b'\x1A\x45\xDF\xA3',
+            'mov': lambda h: h[4:8] in [b'ftyp', b'moov', b'mdat'],
+            'mpg': lambda h: h[:4] == b'\x00\x00\x01\xBA',
+            'mpeg': lambda h: h[:4] == b'\x00\x00\x01\xBA',
+            'rm': lambda h: h[:4] == b'.RMF',
+            'rmvb': lambda h: h[:4] == b'.RMF',
+            'swf': lambda h: h[:3] == b'FWS' or h[:3] == b'CWS',
+            'vob': lambda h: h[:4] == b'\x00\x00\x01\xBA',
+            'webm': lambda h: h[:4] == b'\x1A\x45\xDF\xA3',
+            'wmv': lambda h: h[:4] == b'\x30\x26\xB2\x75',
+            'xvid': lambda h: h[:4] == b'XVID',
+            
+            # Formatos que podem não ter assinatura clara ou são containers
+            'aaf': lambda h: True,
+            'avchd': lambda h: True,
+            'cavs': lambda h: True,
+            'divx': lambda h: True,
+            'dv': lambda h: True,
+            'f4v': lambda h: True,
+            'hevc': lambda h: True,
+            'm2ts': lambda h: True,
+            'mts': lambda h: True,
+            'mxf': lambda h: True,
+            'ogv': lambda h: True,
+            'tod': lambda h: True,
+            'ts': lambda h: True,
+            'wtv': lambda h: True
+        }
+        
+        if file_ext.lower() in video_formats:
             try:
                 with open(filepath, 'rb') as f:
                     header = f.read(12)
-                    if (file_ext == 'wmv' and header[:4] == b'\x30\x26\xB2\x75') or \
-                       (file_ext == 'mkv' and header[:4] == b'\x1A\x45\xDF\xA3') or \
-                       (file_ext == 'avi' and header[:4] == b'RIFF' and header[8:12] == b'AVI ') or \
-                       (file_ext == 'asf' and header[:4] == b'\x30\x26\xB2\x75'):
+                    if video_formats[file_ext.lower()](header):
                         summary['convertible'] = True
                         summary['conversion_options'] = ['MP4']
             except Exception as e:
                 print(f"Erro ao verificar arquivo {file_ext}: {str(e)}")
         
-        if file_ext == 'mp4':
+        if file_ext.lower() == 'mp4':
             summary['compressible'] = True
             summary['compression_options'] = ['MP4 (CRF 28)', 'MP4 (CRF 24)']
     
@@ -131,7 +169,11 @@ class FileProcessor:
     def _handle_conversion(self, filepath: str, action: str, download_folder: str) -> Dict[str, Any]:
         """Lida com todas as operações de conversão"""
         file_ext = os.path.splitext(filepath)[1][1:].lower()
-        converter = self.converters.get(file_ext)
+        
+        # Usa conversor especial se existir, senão usa o genérico
+        converter = self.converters.get(file_ext, self.generic_converter)
+
+        print(converter)
         
         if not converter:
             return {'status': 'error', 'message': f'Conversão não suportada para .{file_ext}'}
@@ -143,7 +185,7 @@ class FileProcessor:
         else:
             output_filename = f"{base_name}_converted.mp4"
         
-        output_path = converter.convert(filepath, output_filename, download_folder)
+        output_path = converter.convert(str(filepath), str(output_filename), str(download_folder))
         
         self._cleanup_original(filepath)
         
